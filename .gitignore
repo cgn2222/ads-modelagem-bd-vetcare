@@ -1,0 +1,28 @@
+# Sistema operacional
+.DS_Store
+Thumbs.db
+desktop.ini
+ehthumbs.db
+
+# Editores e IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# MySQL Workbench / dumps locais
+*.mwb.bak
+*.sql.bak
+*.dump
+*.log
+
+# Docker / ambiente local
+.env
+docker-compose.override.yml
+mysql-data/
+
+# Temporários
+*.tmp
+*.temp
+tmp/

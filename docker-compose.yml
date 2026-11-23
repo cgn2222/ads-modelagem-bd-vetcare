@@ -1,0 +1,37 @@
+# VetCare - MySQL 8.0 pronto para uso
+#
+#   docker compose up -d        -> sobe o MySQL e carrega schema + dados de exemplo
+#   docker compose down -v      -> derruba e APAGA o volume (recarrega tudo na próxima subida)
+#
+# Os scripts em /docker-entrypoint-initdb.d só executam na PRIMEIRA inicialização
+# (volume vazio), em ordem alfabética: 01_schema.sql -> 02_seed.sql.
+#
+# Credenciais abaixo são apenas para DESENVOLVIMENTO LOCAL; sobrescreva via variáveis
+# de ambiente ou arquivo .env (ignorado pelo git) se desejar.
+
+services:
+  db:
+    image: mysql:8.0
+    container_name: vetcare-mysql
+    restart: unless-stopped
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_0900_ai_ci
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-vetcare_dev}
+      TZ: America/Sao_Paulo
+    ports:
+      - "${VETCARE_DB_PORT:-3306}:3306"
+    volumes:
+      - vetcare_data:/var/lib/mysql
+      - ./sql/01_ddl_schema.sql:/docker-entrypoint-initdb.d/01_schema.sql:ro
+      - ./sql/02_dml_seed.sql:/docker-entrypoint-initdb.d/02_seed.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p\"$$MYSQL_ROOT_PASSWORD\" --silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 30s
+
+volumes:
+  vetcare_data:
